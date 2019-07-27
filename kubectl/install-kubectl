@@ -1,0 +1,39 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+append_if_missing() {
+   grep \"$1\" $3 || echo $2 >> $3
+}
+
+###
+# Install certs as precondition for 
+mkdir -p $HOME/.config/.openstack
+chmod 700 $HOME/.config/.openstack
+
+if [ "$DIR/otc_certs.pem" -nt "$HOME/.config/openstack/otc_certs.pem" ]; then
+   cp $DIR/otc_certs.pem $HOME/.config/openstack/otc_certs.pem
+fi
+
+###
+# Install kubernetes client (kubectl)
+# It is used to contact the kubernetes cluster manager that underlies CCE
+#kubestable=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+#curl  https://storage.googleapis.com/kubernetes-release/release/$kubestable/bin/linux/amd64/kubectl > /tmp/kubectl
+#curl  https://storage.googleapis.com/kubernetes-release/release/v1.12.10/bin/linux/amd64/kubectl > /tmp/kubectl
+curl  https://storage.googleapis.com/kubernetes-release/release/v1.11.8/bin/linux/amd64/kubectl > /tmp/kubectl
+chmod 755 /tmp/kubectl
+sudo mv -i -f /tmp/kubectl /usr/local/bin/kubectl
+
+###
+# prepare commandline completion and config directories
+#append_if_missing "kubectl completion bash" "source < (kubectl completion bash)" ~/.bashrc
+mkdir -p $HOME/.kube
+chmod 700 $HOME/.kube
+
+#append_if_missing "kube_used_secrets" "\
+## some useful kubernetes aliases
+#alias kube_used_secrets='kubectl get pods -o json | jq \".items[].spec.containers[].env[]?.valueFrom.secretKeyRef.name\" | grep -v null | sort | uniq'" \
+# ~/.bashrc
+
+$DIR/auth_cluster_contexts $*

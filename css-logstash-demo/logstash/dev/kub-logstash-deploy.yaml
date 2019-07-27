@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: null
+  generation: 1
+  labels:
+    app: elk-objectstore-app
+    version: "1.19.1234"
+  name: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elk-objectstore-app
+      version: "1.19.1234"
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: elk-objectstore-app
+        component: elk-logstash
+        version: "1.19.1234"
+        # version: latest
+      name: elk-objectstore-tmpl
+    spec:
+      containers:
+      - image: 160.44.200.121:443/otc00000000001000000317/logstash:6.3.0
+        imagePullPolicy: Always
+        name: elk-objectstore-elasticsearch
+        ports:
+        - containerPort: 9200
+        resources: {}
+        stdin: true
+        tty: true
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        volumeMounts:
+        - mountPath: /var/lib/logstash/data
+          name: data-volume
+      volumes:
+      - name: data-volume
+        emptyDir: {}
+
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: mypullsecret-short
+      #restartPolicy: Never
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}

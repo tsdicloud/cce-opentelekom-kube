@@ -1,0 +1,112 @@
+#!/usr/bin/python3
+
+import subprocess
+import sys
+import hmac
+import hashlib
+import base64
+import json
+
+from openstack import config as _config
+
+from opentelekom import connection as otc_connection
+from opentelekom.cce import cce_service
+
+
+def shell_exec(cmd):
+    ''' Throws an exception if commanc fails'''
+    kube_result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE)
+    try:
+        return json.loads(kube_result.stdout)
+    except:
+        return None
+
+
+def hasContext(config, username, clustername):
+    def _find_context(c):
+        return c['context']['user']==username and c['context']['cluster']==clustername
+
+    existing_context = list(filter(_find_context, config['contexts']))
+    return True if existing_context else False
+
+def _add_user(context_auth, username):
+    shell_exec(["kubectl", "config", "set",
+                "users."+username+".client-certificate-data" ,
+                context_auth.users[0].user.cert])
+    shell_exec(["kubectl", "config", "set",
+                "users."+username+".client-key-data",
+                context_auth.users[0].user.key])
+
+
+def _add_context(context_auth, identifier, clustername, username, suffix=""):    
+    cl = list(filter(lambda cluster: cluster.name == identifier, context_auth.clusters))
+    if cl:
+        clustername_s = clustername + suffix
+        contextname_s = clustername + "_" + username + suffix
+        if cl[0].cluster.ca_cert is not None:    
+            shell_exec(["kubectl", "config", "set",
+                "clusters."+clustername_s+".certificate-authority-data",
+                cl[0].cluster.ca_cert])
+        else:
+            shell_exec(["kubectl", "config", "set",
+                "clusters."+clustername_s+".insecure-skip-tls-verify",
+                "true"])
+        shell_exec(["kubectl", "config", "set",
+            "clusters."+clustername_s+".server",
+            cl[0].cluster.server])
+        shell_exec(["kubectl", "config", "set-context",
+                contextname_s,
+                "--cluster=" + clustername_s,
+                "--user=" + username])         
+
+
+def main():
+    ''' Add/update cluster access in kube context '''
+    _force = False
+    _clustername = None
+    _username = "user"
+
+    if len(sys.argv) < 2:
+            print("Usage: " + sys.argv[0] + " [-f] [-c clustername] <cloud alias for clouds.yaml>\n\
+                -f: force reload of credentials\n\
+                -c: name of a cluster to add/update (all clusters otherwise)\n\
+                -u: username for context")
+            exit(-1)
+    if "-f" in sys.argv:
+        _force = True
+    try:
+        clusterpos = sys.argv.index("-c")
+        _clustername = sys.argv[clusterpos+1]
+    except ValueError:
+        pass
+    try:
+        userpos = sys.argv.index("-u")
+        _username = sys.argv[userpos+1]
+    except ValueError:
+        pass
+
+    config = _config.OpenStackConfig().get_one(cloud=sys.argv[-1])
+
+    cloud = otc_connection.Connection(config=config)
+    cloud.add_service( cce_service.CceService("ccev2.0", aliases=["cce2"]) )
+    
+    # select affected clusters
+    clusters = cloud.cce2.clusters()
+    if _clustername is not None:
+        clusters = list(filter(lambda cluster: cluster.name == _clustername, clusters))
+
+    # load existing contexts
+    kubeconfig = shell_exec(["kubectl", "config", "view", "-o", "json"])
+    #print(kubeconfig)
+    for cluster in clusters:
+        cluster_username = _username + "-" + cluster.name
+        if _force or not hasContext(kubeconfig, cluster_username, cluster.name):
+            print("Fetching auth for (" + cluster_username + "," + cluster.name + ")")
+            context_auth = cloud.cce2.get_cluster_certs(cluster)
+            _add_user(context_auth, _username)
+            _add_context(context_auth, "internalCluster", cluster.name, _username)
+            _add_context(context_auth, "externalCluster", cluster.name, _username, "_ext")
+
+if __name__ == "__main__":
+    main()  
+

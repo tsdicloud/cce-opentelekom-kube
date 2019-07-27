@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: null
+  generation: 1
+  labels:
+    app: elk-objectstore-app
+    version: "1.19.1113"
+  name: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elk-objectstore-app
+      version: "1.19.1113"
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: elk-objectstore-app
+        version: "1.19.1113"
+        # version: latest
+      name: elk-objectstore-tmpl
+    spec:
+      containers:
+      - image: 160.44.200.121:443/otc00000000001000000317/elasticsearch:5.6.1
+        imagePullPolicy: Always
+        name: elk-objectstore-elasticsearch
+        ports:
+        - containerPort: 9200
+        resources: {}
+        stdin: true
+        tty: true
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: mypullsecret-short
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}

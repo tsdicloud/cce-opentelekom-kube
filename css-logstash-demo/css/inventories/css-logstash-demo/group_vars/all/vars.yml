@@ -1,0 +1,47 @@
+---
+# general openstack parameters
+otc_os_auth:
+  auth_url: "https://iam.eu-de.otc.t-systems.com/v3"
+  domain_name: "{{vault_poc.domain}}"
+  username: "{{vault_poc.username}}"
+  password: "{{vault_poc.password}}"
+  project_name: "{{vault_poc.project}}"
+  tenant_name: "eu-de"
+otc_cert_file: otc_certs.pem
+#ansible_ssh_key: ansible-master2
+
+
+# proxy environment
+# > ansible -m setup <serveraddress>
+# shows default vars available on the corrsponding server
+#
+proxy_host: 172.24.0.4
+proxy_port: 3128
+
+### some derived variables from above paramneters. Do not change!
+otc_os_env:
+  OS_USERNAME: "{{ otc_os_auth.username }}"
+  OS_USER_DOMAIN_NAME: "{{ otc_os_auth.domain_name }}" 
+  OS_PASSWORD: "{{ otc_os_auth.password }}"
+  OS_TENANT_NAME: "{{ otc_os_auth.tenant_name }}" 
+  OS_PROJECT_NAME: "{{ otc_os_auth.project_name }}"
+  OS_AUTH_URL: "{{ otc_os_auth.auth_url }}" 
+  OS_CACERT: "{{ otc_cert_file  }}"
+  OS_ENDPOINT_TYPE: "publicURL" 
+  OS_IDENTITY_API_VERSION: 3
+  OS_IMAGE_API_VERSION: 2
+  OS_VOLUME_API_VERSION: 2 
+#  OS_AUTH_TYPE: password
+
+#otc_aksk_env:
+#  S3_ACCESS_KEY_ID: "{{ vault_poc.ak }}"
+#  S3_SECRET_ACCESS_KEY: "{{ vault_poc.sk }}"
+
+# optional proxy environment (mandatory only for local images)
+proxy_env:
+  http_proxy: http://{{ proxy_host }}:{{ proxy_port }}
+  https_proxy: http://{{ proxy_host }}:{{ proxy_port }}
+  HTTP_PROXY: http://{{ proxy_host }}:{{ proxy_port }}
+  HTTPS_PROXY: http://{{ proxy_host }}:{{ proxy_port }}
+
+

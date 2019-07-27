@@ -1,0 +1,43 @@
+#!/usr/bin/python3
+
+from openstack import config as _config
+
+import subprocess
+import sys
+import hmac
+import hashlib
+import base64
+
+def main():
+    ''' <cloud_name>
+    Pass in a reference to the cloud_name from openstack ~/.config/openstack/clouds.yaml
+    and extract AK/SK from there '''
+
+    if len(sys.argv) < 2:
+            print("Usage: " + sys.argv[0] + " <cloud name in ~/config/openstack/clouds.yaml>")
+            exit(-1)
+
+    config = _config.OpenStackConfig().get_one(cloud=sys.argv[1])
+
+    if (not hasattr(config, 's3_auth') or
+            'sk' not in config.s3_auth or
+            'ak' not in config.s3_auth):
+            print("Please add\ns3_auth:\n  ak: '<my access key>'\n  sk: '<my secret key>' in ~/config/openstack/clouds.yaml>")
+            exit(-2)
+
+    aksk_hash = hmac.new(str.encode(config.s3_auth['sk']), 
+                    msg=str.encode(config.s3_auth['ak']), 
+                    digestmod=hashlib.sha256).digest().hex()
+    subprocess.call(['docker', 'login', 
+                    "-u", config.auth['project_name'] + '@' + config.s3_auth['ak'], 
+                    "-p", aksk_hash,
+                    "100.125.7.25:20202"])
+    subprocess.call(['docker', 'login', 
+                    "-u", config.auth['project_name'] + '@' + config.s3_auth['ak'], 
+                    "-p", aksk_hash,
+                    "80.158.24.86"])
+
+
+if __name__ == "__main__":
+    main()  
+

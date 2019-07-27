@@ -1,0 +1,56 @@
+---  
+  - name: "Security_group {{ net.vpc.name }}-css-sg"
+    os_security_group:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      name: "{{ net.vpc.name }}-css-sg"
+    register: css_sg_result
+  - os_security_group_rule:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      direction: "ingress"
+      protocol: "tcp"
+      port_range_max: 22
+      port_range_min: 22
+      security_group: "{{ css_sg_result.id }}"
+      remote_ip_prefix: "0.0.0.0/0" 
+  - os_security_group_rule:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      direction: "ingress"
+      protocol: "tcp"
+      port_range_max: 9200
+      port_range_min: 9200
+      security_group: "{{ css_sg_result.id }}"
+      remote_ip_prefix: "0.0.0.0/0" 
+
+  - name: CSS service
+    otc_css:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      name: "{{ net.vpc.name }}-css"
+      instances: 1
+      flavor_ref: "css.medium.8"
+      volume_type: "COMMON"
+      volume_size: 40
+      vpc_id: "{{ net.vpc.id }}"
+      subnet_id: "{{ net.subnet.id }}"
+      security_group_id: "{{ css_sg_result.id }}"
+      httpsEnable: "true"
+      # disk_encryption_id: "{{ kms_result.id }}"

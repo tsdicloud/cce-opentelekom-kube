@@ -1,0 +1,7 @@
+---
+net:
+  vpc:
+    name: "vpc-ansible-test"
+    id: "739fc6de-083d-4bff-b6b8-ec75233c6291"
+  subnet:
+    id: "228bad96-95df-4f86-be05-feea23804b89"

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: 2017-09-13T10:57:24Z
+  labels:
+    app: elk-objectstore-app
+  name: elasticsearch-service
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 9200
+    protocol: TCP
+    targetPort: 9200
+  # nodePort: 30445
+  selector:
+    app: elk-objectstore-app
+  sessionAffinity: None
+  type: ClusterIP
+  #type: NodePort
+ 

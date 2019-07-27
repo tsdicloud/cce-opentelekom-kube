@@ -7,7 +7,7 @@ replace_or_add_line() {
 }
 
 append_if_missing() {
-   grep -q \"$1\"" $3 || echo $2 >> $3
+   grep -q \"$1\" $3 || echo $2 >> $3
 }
 
 ###

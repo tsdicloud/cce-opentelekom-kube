@@ -8,6 +8,8 @@ LABEL maintainer="Bernd Rederlechner <bernd.rederlechner@t-systems.com>" \
 
 USER root
 
+RUN yum -y update
+
 # extend entrypoint
 COPY run_with_mappings.sh /usr/local/bin/
 RUN chmod 0755 /usr/local/bin/run_with_mappings.sh

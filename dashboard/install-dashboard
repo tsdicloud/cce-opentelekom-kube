@@ -1,0 +1,12 @@
+#!/bin/bash
+
+kubectl apply -f kube-dashboard-cluster-role.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
+
+# this generates a suitable bearer token for the previously established service account
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-dashboard | awk '{print $1}')
+
+echo "Establish an SSH tunnel to your local machine, default port 8001, then open"
+echo "kubectl proxy & on your remote ssh machine you are logged in"
+echo "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
+

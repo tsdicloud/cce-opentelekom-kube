@@ -14,7 +14,7 @@ sudo ln -s /usr/local/bin/pip3 /usr/bin/pip3
 
 # install OpenStack+OTC extension+shade client lib
 # to control the OpenStack by API
-sudo pip3 install --upgrade pip setuptools packaging
+sudo pip3 install --upgrade pip setuptools packaging netaddr
 
 # thats new since 2018: shade is replaced by openstacksdk, which is now used by ansible
 # and we also want to have opentelekomsdk extensions which automatically pulls
@@ -36,7 +36,7 @@ popd
 pushd /tmp
 # make script more stable and do preventive cleanup
 sudo rm -rf ansible
-git clone git://github.com/ansible/ansible.git --branch stable-2.8
+git clone https://github.com/ansible/ansible --branch v2.8.0
 pushd ansible
 sudo pip3 install -r requirements.txt
 sudo python3 setup.py install

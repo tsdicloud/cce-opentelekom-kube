@@ -1,0 +1,12 @@
+---
+- name: OpenTelekom CSS logstash PaaS demo playbook
+  hosts: infra
+  roles:
+    - { role: vpc, tags: [ vpc, apply, cce, css ], state='present' }
+    - { role: cce, tags: [ cce, apply ], state='present' }
+    - { role: cce, tags: [ cce, destroy], state='absent' }
+    - { role: css, tags: [ css, apply ], state='present' }
+    - { role: css, tags: [ css, destroy], state='absent' }
+    - { role: vpc, tags: [ vpc, destroy, cce, css ], state='absent' }
+
+    

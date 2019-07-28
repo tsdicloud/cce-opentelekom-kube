@@ -1,0 +1,24 @@
+---
+# general openstack parameters
+otc_os_auth:
+  auth_url: "https://iam.eu-de.otc.t-systems.com/v3"
+  domain_name: "{{vault_poc.domain}}"
+  username: "{{vault_poc.username}}"
+  password: "{{vault_poc.password}}"
+  project_name: "{{vault_poc.project}}"
+  tenant_name: "eu-de"
+otc_cert_file: "{{ ansible_env.HOME }}/.config/openstack/otc_certs.pem"
+#ansible_ssh_key: ansible-master2
+
+otc_aksk:
+  S3_ACCESS_KEY_ID: "{{ vault_poc.ak }}"
+  S3_SECRET_ACCESS_KEY: "{{ vault_poc.sk }}"
+
+# optional proxy environment (mandatory only for local images)
+proxy_env:
+  http_proxy: http://{{ proxy_host }}:{{ proxy_port }}
+  https_proxy: http://{{ proxy_host }}:{{ proxy_port }}
+  HTTP_PROXY: http://{{ proxy_host }}:{{ proxy_port }}
+  HTTPS_PROXY: http://{{ proxy_host }}:{{ proxy_port }}
+
+

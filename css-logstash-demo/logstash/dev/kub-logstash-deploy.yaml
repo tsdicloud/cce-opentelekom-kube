@@ -31,9 +31,9 @@ spec:
       name: elk-objectstore-tmpl
     spec:
       containers:
-      - image: 160.44.200.121:443/otc00000000001000000317/logstash:6.3.0
+      - image: 100.125.7.25:20202/bmw1/logstash:1.2
         imagePullPolicy: Always
-        name: elk-objectstore-elasticsearch
+        name: elk-objectstore-shakespear
         ports:
         - containerPort: 9200
         resources: {}
@@ -51,7 +51,7 @@ spec:
 
       dnsPolicy: ClusterFirst
       imagePullSecrets:
-      - name: mypullsecret-short
+      - name: pullsecret-bmw1
       #restartPolicy: Never
       securityContext: {}
       terminationGracePeriodSeconds: 30

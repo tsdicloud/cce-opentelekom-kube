@@ -1,0 +1,76 @@
+---  
+  - name: CCE service
+    otc_cce:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      name: "{{ prefix }}-cce"
+      type: "VirtualMachine"
+      flavor: "cce.s2.small" # a small HA cluster
+      version: "v1.11.3-r1"
+      description: "OpenTelekom SDK test cce demo cluster"
+      vpc_id: "{{ net_facts.vpc.id }}"
+      subnet_id: "{{ net_facts.subnets.worker.id }}"
+      container_net_mode: "overlay_l2"
+      container_net_cidr: "172.16.0.0/16"
+    register: cluster 
+
+  - name: CCE nodes in az1
+    otc_cce_node:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      cluster: "{{ cluster.id }}"
+      name: "{{ prefix }}-cce-node"
+      flavor: "s2.large.1"
+      availability_zone: "eu-de-01"
+      count: 2
+      key_name: "brederle-master"
+      wait: "False"
+      root_volume:
+        type: "SATA"
+        size: 40
+      data_volumes:
+        - type: "SATA"
+          size: 100
+    register: nodeset1
+
+  - name: CCE nodes in az2
+    otc_cce_node:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      cluster: "{{ cluster.id }}"
+      name: "{{ prefix }}-cce-node"
+      flavor: "s2.large.1"
+      availability_zone: "eu-de-02"
+      count: 2
+      key_name: "brederle-master"
+      wait: "False"
+      root_volume:
+        type: "SATA"
+        size: 100
+      data_volumes:
+        - type: "SATA"
+          size: 100
+    register: nodeset2
+
+  - otc_cce_node_facts:
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      cluster: "{{ cluster.id }}"
+      node_ids: "{{ nodeset1.ids | union(nodeset2.ids) }}"
+      wait: True
+      wait_status: "active"

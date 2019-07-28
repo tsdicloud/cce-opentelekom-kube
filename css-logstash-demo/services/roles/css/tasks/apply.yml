@@ -1,0 +1,59 @@
+---  
+  - name: "Security_group {{ prefix }}-css-sg"
+    os_security_group:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      name: "{{ prefix }}-css-sg"
+      project: "{{ otc_os_auth.project_name }}"
+    register: css_sg_result
+  - os_security_group_rule:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      project: "{{ otc_os_auth.project_name }}"
+      direction: "ingress"
+      protocol: "tcp"
+      port_range_max: 22
+      port_range_min: 22
+      security_group: "{{ css_sg_result.id }}"
+      remote_ip_prefix: "0.0.0.0/0" 
+  - os_security_group_rule:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      project: "{{ otc_os_auth.project_name }}"
+      direction: "ingress"
+      protocol: "tcp"
+      port_range_max: 9200
+      port_range_min: 9200
+      security_group: "{{ css_sg_result.id }}"
+      remote_ip_prefix: "0.0.0.0/0" 
+
+  - name: CSS service
+    otc_css:
+      state: "present"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      name: "{{ prefix }}-css"
+      instances: 1
+      flavor_ref: "css.medium.8"
+      volume_type: "COMMON"
+      volume_size: 40
+      vpc_id: "{{ net_facts.vpc.id }}"
+      subnet_id: "{{ net_facts.subnets.worker.id }}"
+      security_group_id: "{{ css_sg_result.id }}"
+      httpsEnable: "true"
+      # disk_encryption_id: "{{ kms_result.id }}"

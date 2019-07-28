@@ -8,7 +8,7 @@ metadata:
   labels:
     app: elk-objectstore-app
     version: "1.19.1113"
-  name: elasticsearch
+  name: logstash
 spec:
   replicas: 1
   selector:
@@ -30,20 +30,23 @@ spec:
       name: elk-objectstore-tmpl
     spec:
       containers:
-      - image: 160.44.200.121:443/otc00000000001000000317/elasticsearch:5.6.1
+      - image: 100.125.7.25:20202/bmw1/logstash:1.5
         imagePullPolicy: Always
         name: elk-objectstore-elasticsearch
-        ports:
-        - containerPort: 9200
         resources: {}
         stdin: true
         tty: true
         securityContext:
           privileged: false
+        env:
+        - name: ELASTICSEARCH_SERVICE_HOST
+          value: "10.147.34.205"
+        - name: ELASTICSEARCH_SERVICE_PORT
+          value: "9200"
         terminationMessagePath: /dev/termination-log
       dnsPolicy: ClusterFirst
       imagePullSecrets:
-      - name: mypullsecret-short
+      - name: pullsecret-bmw1
       restartPolicy: Always
       securityContext: {}
       terminationGracePeriodSeconds: 30

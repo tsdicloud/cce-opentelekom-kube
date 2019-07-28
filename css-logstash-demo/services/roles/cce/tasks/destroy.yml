@@ -1,0 +1,10 @@
+---
+  - name: Cleanup CSS service
+    otc_cce:
+      state: "absent"
+      auth_type: password
+      auth:
+        "{{ otc_os_auth }}"
+      cacert: "{{ otc_cert_file }}"
+      validate_certs: "yes"
+      name: "{{ prefix }}-cce"

@@ -1,0 +1,22 @@
+---
+net:
+  vpc:
+    name: "{{prefix}}-vpc"
+    cidr: "10.147.0.0/16"
+  subnets:
+    access:
+      name: "{{prefix}}-access-sn"
+      cidr: "10.147.0.0/22"
+      nameservers: "{{ ['100.125.4.25', '8.8.8.8'] }}"  # the usual Open Telekom Default
+    worker:
+      name: "{{prefix}}-worker-sn"
+      cidr: "10.147.32.0/22"
+      nameservers: "{{ ['100.125.4.25', '8.8.8.8'] }}"
+    backend:
+      name: "{{prefix}}-backend-sn"
+      cidr: "10.147.64.0/22"
+      nameservers: "{{ ['100.125.4.25', '8.8.8.8'] }}"
+  dns:
+    zone: "{{ prefix | regex_replace('[_-]', '') }}.internal"
+#kms:
+#  keyname: "rbe-sdktest-key-000018"

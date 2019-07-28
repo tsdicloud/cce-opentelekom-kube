@@ -1,0 +1,6 @@
+---
+  - include_tasks: apply.yml
+    when: state == "present" 
+
+  - include_tasks: destroy.yml
+    when: state == "absent" 

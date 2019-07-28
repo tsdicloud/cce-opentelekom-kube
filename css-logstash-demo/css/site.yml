@@ -1,9 +1,0 @@
----
-- name: OpenTelekom ansible task test playbook
-  hosts: infra
-  roles:
-    - { role: css, tags: [ css, apply ], state='present' }
-    - { role: css, tags: [ css, destroy], state='absent' }
-    #- { role: exceptiontest, tags: [ test-ex, apply ], state='present' }
-
-    

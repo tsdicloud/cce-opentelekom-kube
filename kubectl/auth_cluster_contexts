@@ -29,20 +29,23 @@ def hasContext(config, username, clustername):
     existing_context = list(filter(_find_context, config['contexts']))
     return True if existing_context else False
 
-def _add_user(context_auth, username):
+def _add_user(context_auth, clustername, username):
+    username_s    = username + "-" + clustername
     shell_exec(["kubectl", "config", "set",
-                "users."+username+".client-certificate-data" ,
+                "users."+username_s+".client-certificate-data" ,
                 context_auth.users[0].user.cert])
     shell_exec(["kubectl", "config", "set",
-                "users."+username+".client-key-data",
+                "users."+username_s+".client-key-data",
                 context_auth.users[0].user.key])
 
 
 def _add_context(context_auth, identifier, clustername, username, suffix=""):    
     cl = list(filter(lambda cluster: cluster.name == identifier, context_auth.clusters))
     if cl:
+        username_s    = username + "-" + clustername
         clustername_s = clustername + suffix
-        contextname_s = clustername + "_" + username + suffix
+        contextname_s = username + "_" + clustername + suffix
+        
         if cl[0].cluster.ca_cert is not None:    
             shell_exec(["kubectl", "config", "set",
                 "clusters."+clustername_s+".certificate-authority-data",
@@ -57,7 +60,7 @@ def _add_context(context_auth, identifier, clustername, username, suffix=""):
         shell_exec(["kubectl", "config", "set-context",
                 contextname_s,
                 "--cluster=" + clustername_s,
-                "--user=" + username])         
+                "--user=" + username_s])         
 
 
 def main():
@@ -103,7 +106,7 @@ def main():
         if _force or not hasContext(kubeconfig, cluster_username, cluster.name):
             print("Fetching auth for (" + cluster_username + "," + cluster.name + ")")
             context_auth = cloud.cce2.get_cluster_certs(cluster)
-            _add_user(context_auth, _username)
+            _add_user(context_auth, cluster.name, _username)
             _add_context(context_auth, "internalCluster", cluster.name, _username)
             _add_context(context_auth, "externalCluster", cluster.name, _username, "_ext")
 

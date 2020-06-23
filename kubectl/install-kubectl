@@ -21,7 +21,7 @@ fi
 #kubestable=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
 #curl  https://storage.googleapis.com/kubernetes-release/release/$kubestable/bin/linux/amd64/kubectl > /tmp/kubectl
 #curl  https://storage.googleapis.com/kubernetes-release/release/v1.12.10/bin/linux/amd64/kubectl > /tmp/kubectl
-curl  https://storage.googleapis.com/kubernetes-release/release/v1.11.8/bin/linux/amd64/kubectl > /tmp/kubectl
+curl  https://storage.googleapis.com/kubernetes-release/release/v1.13.10/bin/linux/amd64/kubectl > /tmp/kubectl
 chmod 755 /tmp/kubectl
 sudo mv -i -f /tmp/kubectl /usr/local/bin/kubectl
 
@@ -36,4 +36,4 @@ chmod 700 $HOME/.kube
 #alias kube_used_secrets='kubectl get pods -o json | jq \".items[].spec.containers[].env[]?.valueFrom.secretKeyRef.name\" | grep -v null | sort | uniq'" \
 # ~/.bashrc
 
-$DIR/auth_cluster_contexts $*
+$DIR/cce_auth_cluster_contexts $*

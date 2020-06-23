@@ -8,7 +8,7 @@ sudo yum -y install epel-release
 sudo yum -y update --skip-broken
 
 # install python 3 and support tools
-sudo yum --enablerepo=epel -y install make rpm-build python36 python36-docutils asciidoc git expect libffi-devel openssl-devel --skip-broken
+sudo yum --enablerepo=epel -y install make rpm-build python3 python3-docutils asciidoc git expect libffi-devel openssl-devel --skip-broken
 sudo python3 -m ensurepip
 sudo ln -s /usr/local/bin/pip3 /usr/bin/pip3
 
@@ -33,16 +33,16 @@ popd
 # checkout current version of ansible from git
 # Ansible 2.x is not available as ready-made rpm package yet in repos
 # generally, use /tmp as working directory
-pushd /tmp
+#pushd /tmp
 # make script more stable and do preventive cleanup
-sudo rm -rf ansible
-git clone https://github.com/ansible/ansible --branch v2.8.0
-pushd ansible
-sudo pip3 install -r requirements.txt
-sudo python3 setup.py install
-popd
-sudo rm -rf ansible
-popd
+#sudo rm -rf ansible
+#git clone https://github.com/ansible/ansible --branch v2.8.0
+#pushd ansible
+#sudo pip3 install -r requirements.txt
+#sudo python3 setup.py install
+#popd
+#sudo rm -rf ansible
+#popd
 
 # or installas rpm directly from ansible
 #sudo yum install https://releases.ansible.com/ansible/rpm/release/epel-7-x86_64/ansible-2.7.9-1.el7.ans.noarch.rpm
@@ -53,11 +53,11 @@ popd
 #sudo /usr/bin/pip3 install ansible
 
 # enable TCP forwarding e.g. for VSCode Remote Development
-sudo sed -i 's/^.*AllowTcpForwarding.*/AllowTcpForwarding yes/' /etc/ssh/sshd_config
-sudo systemctl restart sshd
-sudo -- bash -c "grep -q  'fs.inotify.max_user_watches' /etc/sysctl.conf && 
-       sed -i 's/.*fs.inotify.max_user_watches.*/fs.inotify.max_user_watches=524288/' /etc/sysctl.conf || 
-       echo 'fs.inotify.max_user_watches=524288' >> /etc/sysctl.conf"
-sudo sysctl -p
+#sudo sed -i 's/^.*AllowTcpForwarding.*/AllowTcpForwarding yes/' /etc/ssh/sshd_config
+#sudo systemctl restart sshd
+#sudo -- bash -c "grep -q  'fs.inotify.max_user_watches' /etc/sysctl.conf && 
+#       sed -i 's/.*fs.inotify.max_user_watches.*/fs.inotify.max_user_watches=524288/' /etc/sysctl.conf || 
+#       echo 'fs.inotify.max_user_watches=524288' >> /etc/sysctl.conf"
+#sudo sysctl -p
 
 # TODO: add ansible vault password

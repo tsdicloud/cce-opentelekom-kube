@@ -2,12 +2,12 @@
 
 kubectl apply -f kube-dashboard-cluster-role.yaml
 # see https://github.com/kubernetes/dashboard/releases for current dashboard version and compatibility
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/aio/deploy/recommended.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-rc1/aio/deploy/recommended.yaml
 
 # this generates a suitable bearer token for the previously established service account
 echo
 echo  "*** Generate an initial bearer token"
-kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-dashboard | awk '{print $1}')
+kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep kubernetes-dashboard | awk '{print $1}')
 
 echo
 echo "*** Next steps:"

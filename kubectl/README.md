@@ -22,3 +22,26 @@ NOTES:
 ```> kubectl version
 > kubectl get namespace
 ```
+
+### Foreach namespace: create a repo secret and use it in kube manifest yamls
+if you reference a container in your kubernetes yamls, and you use the OTC CCE image repo, you have to
+- refer properly to the image
+- use a secret to have access to the private image repo.
+An example snipppet is:
+```
+namespace: mynamespace
+...
+spec:
+  spec:
+      containers:
+      - image: 100.125.7.25:20202/my_organisation/my_image:1.42
+      imagePullSecrets:
+      - name: reposecret
+```
+
+Note: if your image is based upon 'external' images from internet sources, you have to have SNAT configured because Kubernetes takes these directly from their sources.
+
+You can create the secret by using
+```> cce_kubesecret mynamespace reposecret
+```
+The secret is composed from the informations in your `~/.docker/config.json`.

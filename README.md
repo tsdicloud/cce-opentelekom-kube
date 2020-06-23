@@ -20,3 +20,7 @@ to find helper scripts and artefacts
 ### Step 3 (optional): Install suitable original Kubernetes dashboard
 Go to [original Kubernetes Dashboard](./dashboard)
 to find helper scripts and artefacts
+
+### For each new namespace: create a secret for repo access
+Go to [Google Kubectl](./kubectl)
+and use `cce_kubesecret `

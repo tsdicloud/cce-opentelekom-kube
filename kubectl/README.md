@@ -42,6 +42,7 @@ spec:
 Note: if your image is based upon 'external' images from internet sources, you have to have SNAT configured because Kubernetes takes these directly from their sources.
 
 You can create the secret by using
-```> cce_kubesecret mynamespace reposecret
+```
+> cce_kubesecret mynamespace reposecret
 ```
 The secret is composed from the informations in your `~/.docker/config.json`.
